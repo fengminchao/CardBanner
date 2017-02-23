@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     private List<ViewHolder<Integer>> mViewHolders = new ArrayList<>();
 
-    private Integer[] resIds = {R.drawable.album,R.drawable.bqa,R.drawable.dogsbanner};
+    private Integer[] resIds = {R.drawable.album,R.drawable.ow,R.drawable.bili};
     private List<Integer> resIdList = new ArrayList<>();
 
     @Override
@@ -44,8 +44,9 @@ public class MainActivity extends AppCompatActivity {
         }
         resIdList = Arrays.asList(resIds);
         mCardBanner.setViewHolders(mViewHolders,resIdList);
-        mCardBanner.setScrollDuration(5000);
+        mCardBanner.setScrollDuration(3000);
         mCardBanner.setScrollTime(500);
+        mCardBanner.setAutoScroll(true);
 
     }
 }

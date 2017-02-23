@@ -14,7 +14,8 @@
         android:layout_height="150dp"
         android:layout_centerVertical="true"
         app:cardMargin="16dp"
-        app:baseElevation="2dp"
+        app:baseElevation="4dp"
+        app:cardRadius="8dp"
         app:floatElevation="8dp"
         app:isLoop="false"
         app:sideCardWidth="16dp"/>
