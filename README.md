@@ -1,5 +1,7 @@
 # CardBanner
 
+[![](https://jitpack.io/v/fengminchao/CardBanner.svg)](https://jitpack.io/#fengminchao/CardBanner)
+
 卡片式 Banner,支持无限循环滚动,自动滚动播放.
 
 ## 效果图
@@ -24,7 +26,7 @@ allprojects {
 
 ```
 	dependencies {
-	        compile 'com.github.fengminchao:CardBanner:0.8'
+	        compile 'com.github.fengminchao:CardBanner:0.9'
 	}
 ```
 
