@@ -59,8 +59,8 @@ public class CardBanner<T> extends ViewPager {
         mCardRadius = a.getDimension(R.styleable.CardBanner_cardRadius, dp2px(4));
         mCardMargin = a.getDimension(R.styleable.CardBanner_cardMargin, dp2px(8));
         mSideCardWidth = a.getDimension(R.styleable.CardBanner_sideCardWidth, dp2px(16));
-        mBaseElevation = a.getDimension(R.styleable.CardBanner_baseElevation, dp2px(4));
-        mFloatElevation = a.getDimension(R.styleable.CardBanner_floatElevation, dp2px(4));
+        mBaseElevation = a.getDimension(R.styleable.CardBanner_baseElevation, dp2px(0));
+        mFloatElevation = a.getDimension(R.styleable.CardBanner_floatElevation, dp2px(0));
         a.recycle();
 
         initScroller();
