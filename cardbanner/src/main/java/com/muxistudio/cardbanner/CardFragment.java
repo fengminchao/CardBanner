@@ -41,7 +41,7 @@ public class CardFragment<T> extends Fragment {
         mCardView = (CardView) view.findViewById(R.id.card_view);
         FrameLayout.LayoutParams cardParams =
                 (FrameLayout.LayoutParams) mCardView.getLayoutParams();
-        int marginVertical = (int) (16 * getResources().getDisplayMetrics().density);
+        int marginVertical = (int) (4 * getResources().getDisplayMetrics().density);
         Log.d("banner margin", cardMargin + "  " + marginVertical);
         cardParams.setMargins(cardMargin, marginVertical, cardMargin, marginVertical);
         mCardView.setLayoutParams(cardParams);

@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:id="@+id/card_view"
         android:layout_height="match_parent"
-        android:layout_margin="8dp"
+        android:layout_margin="4dp"
         app:cardCornerRadius="4dp"
         app:cardElevation="4dp">
 
