@@ -6,6 +6,6 @@
         <attr name="cardMargin" format="dimension"/>
         <attr name="sideCardWidth" format="dimension"/>
         <attr name="baseElevation" format="dimension"/>
-        <attr name="floatElevation" format="dimension"/>
+        <attr name="scaleRatio" format="float"/>
     </declare-styleable>
 </resources>

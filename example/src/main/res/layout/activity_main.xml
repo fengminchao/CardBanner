@@ -13,11 +13,11 @@
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:layout_centerVertical="true"
-        app:cardMargin="16dp"
-        app:cardRadius="8dp"
+        app:cardMargin="4dp"
+        app:cardRadius="4dp"
         app:isLoop="false"
         app:baseElevation="4dp"
-        app:floatElevation="4dp"
-        app:sideCardWidth="16dp"/>
+        app:scaleRatio="1.1"
+        app:sideCardWidth="20dp"/>
 
 </RelativeLayout>

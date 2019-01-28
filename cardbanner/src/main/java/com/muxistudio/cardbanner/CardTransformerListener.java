@@ -2,7 +2,6 @@ package com.muxistudio.cardbanner;
 
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
-import android.view.View;
 
 /**
  * Created by ybao on 17/2/18.
@@ -12,13 +11,17 @@ public class CardTransformerListener implements ViewPager.OnPageChangeListener{
 
     private boolean mScalingEnabled;
     private CardAdapter mAdapter;
+    private float mScaleRatioOffset;
     private float mLastOffset;
 
     private ViewPager.OnPageChangeListener mOnPageChangeListener;
 
-    public CardTransformerListener(CardAdapter cardAdapter,boolean scalingEnabled) {
+    public CardTransformerListener(CardAdapter cardAdapter, float scaleRatio) {
         mAdapter = cardAdapter;
-        mScalingEnabled = scalingEnabled;
+        mScaleRatioOffset = scaleRatio - 1;
+        if (mScaleRatioOffset > 0){
+            mScalingEnabled = true;
+        }
     }
 
     @Override
@@ -50,8 +53,8 @@ public class CardTransformerListener implements ViewPager.OnPageChangeListener{
 
         if (currentCard != null) {
             if (mScalingEnabled) {
-                currentCard.setScaleX((float) (1 + 0.1 * (1 - realOffset)));
-                currentCard.setScaleY((float) (1 + 0.1 * (1 - realOffset)));
+                currentCard.setScaleX((float) (1 + mScaleRatioOffset * (1 - realOffset)));
+                currentCard.setScaleY((float) (1 + mScaleRatioOffset * (1 - realOffset)));
             }
             currentCard.setCardElevation((baseElevation + (floatElevation - baseElevation)
                     * (1 - realOffset)));
@@ -61,8 +64,8 @@ public class CardTransformerListener implements ViewPager.OnPageChangeListener{
 
         if (nextCard != null) {
             if (mScalingEnabled) {
-                nextCard.setScaleX((float) (1 + 0.1 * (realOffset)));
-                nextCard.setScaleY((float) (1 + 0.1 * (realOffset)));
+                nextCard.setScaleX((float) (1 + mScaleRatioOffset * (realOffset)));
+                nextCard.setScaleY((float) (1 + mScaleRatioOffset * (realOffset)));
             }
             nextCard.setCardElevation((baseElevation + (floatElevation - baseElevation)
                     * (realOffset)));

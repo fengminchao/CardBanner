@@ -4,16 +4,13 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.Px;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-
-import java.util.List;
+import android.view.ViewTreeObserver;
+import android.widget.LinearLayout;
 
 /**
  * Created by ybao on 17/2/18.
@@ -21,30 +18,52 @@ import java.util.List;
 
 public class CardFragment<T> extends Fragment {
 
+    private static final String TAG = "CardFragment";
+
     private CardView mCardView;
     private View contentView;
     private int cardMargin;
 
-    public static CardFragment newInstance() {
+    private float mBaseElevation;
+    private float mScaleRatio;
+    //阴影高度至平面所需的长度比率
+    private static final float ELEVATION_2_PLANE_RATIO = 1.5f;
+
+    private static final String EXTRA_BASE_ELEVATION = "base_elevation";
+    private static final String EXTRA_SCALE_RATIO = "scale_ratio";
+    private static final String EXTRA_CARD_MARGIN = "card_margin";
+
+    private CardFragment() {
+    }
+
+    public static CardFragment newInstance(float baseElevation, float scaleRatio, int cardMargin) {
         Bundle args = new Bundle();
         CardFragment fragment = new CardFragment();
+        args.putFloat(EXTRA_BASE_ELEVATION, baseElevation);
+        args.putFloat(EXTRA_SCALE_RATIO, scaleRatio);
+        args.putInt(EXTRA_CARD_MARGIN, cardMargin);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            mBaseElevation = bundle.getFloat(EXTRA_BASE_ELEVATION, 0);
+            mScaleRatio = bundle.getFloat(EXTRA_SCALE_RATIO, 1);
+            cardMargin = bundle.getInt(EXTRA_CARD_MARGIN, 0);
+        }
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
+                             @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.view_card, container, false);
 
-        mCardView = (CardView) view.findViewById(R.id.card_view);
-        FrameLayout.LayoutParams cardParams =
-                (FrameLayout.LayoutParams) mCardView.getLayoutParams();
-        int marginVertical = (int) (4 * getResources().getDisplayMetrics().density);
-        Log.d("banner margin", cardMargin + "  " + marginVertical);
-        cardParams.setMargins(cardMargin, marginVertical, cardMargin, marginVertical);
-        mCardView.setLayoutParams(cardParams);
+        mCardView = view.findViewById(R.id.card_view);
 
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -55,6 +74,23 @@ public class CardFragment<T> extends Fragment {
             }
             mCardView.addView(contentView, params);
         }
+
+        mCardView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (mCardView.getWidth() == ((ViewGroup) mCardView.getParent()).getWidth()) {
+                    LinearLayout.LayoutParams cardParams =
+                            (LinearLayout.LayoutParams) mCardView.getLayoutParams();
+                    ViewGroup parent = (ViewGroup) mCardView.getParent();
+                    Log.v(TAG, "onGlobalLayout: card's parent width:" + parent.getWidth() + " height: " + parent.getHeight());
+                    cardParams.width = (int) ((mCardView.getWidth() - cardMargin - mBaseElevation * ELEVATION_2_PLANE_RATIO * mScaleRatio * 2) / mScaleRatio);
+                    cardParams.height = (int) ((mCardView.getHeight() - mBaseElevation * mScaleRatio * ELEVATION_2_PLANE_RATIO * 2) / mScaleRatio);
+                    mCardView.setLayoutParams(cardParams);
+                    Log.v(TAG, "onGlobalLayout: card width: " + cardParams.width + " height: " + cardParams.height);
+                    mCardView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
+            }
+        });
         return view;
     }
 
@@ -62,12 +98,9 @@ public class CardFragment<T> extends Fragment {
         contentView = viewHolder.getView(getContext(), data);
     }
 
-    public void setCardMargin(@Px int margin) {
-        cardMargin = margin;
-    }
-
     public CardView getCardView() {
         return mCardView;
     }
+
 
 }

@@ -1,16 +1,10 @@
 package com.muxistudio.cardbanner;
 
-import android.animation.ObjectAnimator;
-import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.widget.CardView;
-import android.util.Log;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +29,8 @@ public class CardFragmentPagerAdapter<T> extends FragmentStatePagerAdapter imple
     private List<T> mData = new ArrayList<>();
 
     public CardFragmentPagerAdapter(FragmentManager fm,
-            List<ViewHolder<T>> viewHolders, List<T> data,int cardMargin, float baseElevation,
-            float floatElevation, boolean isLoop) {
+                                    List<ViewHolder<T>> viewHolders, List<T> data, int cardMargin, float baseElevation,
+                                    float scaleRatio, boolean isLoop) {
         super(fm);
 
         if (viewHolders.size() != data.size()) {
@@ -72,12 +66,11 @@ public class CardFragmentPagerAdapter<T> extends FragmentStatePagerAdapter imple
             size = realSize;
         }
         mElevation = baseElevation;
-        mFloatElevation = floatElevation;
+        mFloatElevation = scaleRatio * baseElevation;
 
         for (int i = 0; i < size; i++) {
-            CardFragment cardFragment = CardFragment.newInstance();
+            CardFragment cardFragment = CardFragment.newInstance(mElevation,scaleRatio,cardMargin);
             cardFragment.setCardContentView(mViewHolders.get(i), mData.get(i));
-            cardFragment.setCardMargin(cardMargin);
             mCardFragments.add(cardFragment);
         }
 

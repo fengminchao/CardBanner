@@ -6,7 +6,6 @@ import android.content.res.TypedArray;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import java.lang.ref.WeakReference;
@@ -24,8 +23,7 @@ public class CardBanner<T> extends ViewPager {
     private float mCardRadius;
     private float mSideCardWidth;
     private float mBaseElevation;
-    private float mFloatElevation;
-    private boolean mScalingEnabled;
+    private float mScaleRatio;
 
     private int currentItem;
     //datalist 真实的大小
@@ -60,7 +58,7 @@ public class CardBanner<T> extends ViewPager {
         mCardMargin = a.getDimension(R.styleable.CardBanner_cardMargin, dp2px(8));
         mSideCardWidth = a.getDimension(R.styleable.CardBanner_sideCardWidth, dp2px(16));
         mBaseElevation = a.getDimension(R.styleable.CardBanner_baseElevation, dp2px(0));
-        mFloatElevation = a.getDimension(R.styleable.CardBanner_floatElevation, dp2px(0));
+        mScaleRatio = a.getFloat(R.styleable.CardBanner_scaleRatio,1);
         a.recycle();
 
         initScroller();
@@ -83,7 +81,7 @@ public class CardBanner<T> extends ViewPager {
         }
 
         CardTransformerListener cardTransformerListener = new CardTransformerListener(
-                mCardFragmentPagerAdapter, mScalingEnabled);
+                mCardFragmentPagerAdapter, mScaleRatio);
         addOnPageChangeListener(cardTransformerListener);
         cardTransformerListener.setOnPageChangeListener(new OnPageChangeListener() {
             @Override
@@ -120,7 +118,7 @@ public class CardBanner<T> extends ViewPager {
 
         mCardFragmentPagerAdapter = new CardFragmentPagerAdapter(
                 ((AppCompatActivity) getContext()).getSupportFragmentManager(), viewHolders,
-                datas, (int)mCardMargin,mBaseElevation, mFloatElevation, mIsLoop);
+                datas, (int)mCardMargin,mBaseElevation, mScaleRatio, mIsLoop);
         this.setAdapter(mCardFragmentPagerAdapter);
         realSize = datas.size();
 
@@ -189,6 +187,14 @@ public class CardBanner<T> extends ViewPager {
     }
 
     @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (isAutoScrolling){
+            removeCallbacks(mAutoScrollTask);
+        }
+    }
+
+    @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         switch (ev.getAction()) {
             case MotionEvent.ACTION_CANCEL:
@@ -211,8 +217,7 @@ public class CardBanner<T> extends ViewPager {
 
         final WeakReference<CardBanner> mCardBannerWeakReference;
 
-        public AutoScrollTask(
-                CardBanner cardBanner) {
+        public AutoScrollTask(CardBanner cardBanner) {
             mCardBannerWeakReference = new WeakReference<CardBanner>(cardBanner);
         }
 

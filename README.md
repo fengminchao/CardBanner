@@ -26,7 +26,7 @@ allprojects {
 
 ```
 	dependencies {
-	        compile 'com.github.fengminchao:CardBanner:0.9'
+	        compile 'com.github.fengminchao:CardBanner:1.1'
 	}
 ```
 
@@ -43,16 +43,23 @@ allprojects {
         app:cardMargin="16dp"
         app:baseElevation="4dp"
         app:cardRadius="8dp"
-        app:floatElevation="8dp"
+        app:scaleRatio="1.1"
         app:isLoop="false"
         app:sideCardWidth="16dp"/>
 ```
 
 - cardMargin: 卡片的水平间距
 - baseElevation: 卡片的初始高度
-- floatElevation: 卡片处于中心位置时的高度
+- scaleRatio: 中间的卡片放大比率
 - isLoop: 是否可无限循环滑动
 - sideCardWidth: 两边的卡片所显示的宽度
+
+具体内部卡片的宽高设置如代码内部所示，其实在设置上面几个属性的时候已经影响了卡片的宽高
+```java
+//这是卡片还没被缩放时的宽高，其实cardMargin在卡片Z轴高度为0，且没有scaleRatio为1时是准的，其他情况下还要自己计算下，根据计算所得来调整出一个适合自己 banner 图片的卡片宽高比，ELEVATION_2_PLANE_RATIO是为了卡片的阴影能展示出来给其留了一定空间。
+cardParams.width = (int)((mCardView.getWidth() - cardMargin - mBaseElevation * ELEVATION_2_PLANE_RATIO * mScaleRatio * 2) / mScaleRatio);
+cardParams.height = (int)((mCardView.getHeight() - mBaseElevation * mScaleRatio * ELEVATION_2_PLANE_RATIO * 2) / mScaleRatio);
+```
 
 ### In Java
 
@@ -98,6 +105,15 @@ allprojects {
         mCardBanner.setScrollTime(500);
     }
 ```
+
+## ChangeLogs
+
+### v1.1
+- 修复一些 bug
+- 增加一些可配置的属性
+
+### v1.0
+- 初始版本发布
 
 ## Thanks
 [ViewPagerCards](https://github.com/rubensousa/ViewPagerCards)
