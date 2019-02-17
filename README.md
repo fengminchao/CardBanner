@@ -26,7 +26,7 @@ allprojects {
 
 ```
 	dependencies {
-	        compile 'com.github.fengminchao:CardBanner:1.1'
+	        compile 'com.github.fengminchao:CardBanner:1.1.1'
 	}
 ```
 
@@ -107,6 +107,9 @@ cardParams.height = (int)((mCardView.getHeight() - mBaseElevation * mScaleRatio 
 ```
 
 ## ChangeLogs
+
+### v1.1.1
+- 修复 isLoop="true"时的 bug
 
 ### v1.1
 - 修复一些 bug
