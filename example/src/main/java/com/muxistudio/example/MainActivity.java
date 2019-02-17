@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mCardBanner = (CardBanner) findViewById(R.id.card_banner);
 
-        for (int i = 0;i < 3;i ++) {
+        for (int i = 0;i < resIds.length;i ++) {
             ViewHolder<Integer> viewHolder = new ViewHolder<Integer>() {
                 @Override
                 public View getView(Context context, Integer data) {

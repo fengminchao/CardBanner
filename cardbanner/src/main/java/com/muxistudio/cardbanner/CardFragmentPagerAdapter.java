@@ -4,9 +4,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -28,6 +30,11 @@ public class CardFragmentPagerAdapter<T> extends FragmentStatePagerAdapter imple
     private List<ViewHolder<T>> mViewHolders = new ArrayList<>();
     private List<T> mData = new ArrayList<>();
 
+    private Fragment[] mStartFragmentsCache = new Fragment[3];
+    private Fragment[] mEndFragmentsCache = new Fragment[3];
+
+    private boolean mIsLoop = false;
+
     public CardFragmentPagerAdapter(FragmentManager fm,
                                     List<ViewHolder<T>> viewHolders, List<T> data, int cardMargin, float baseElevation,
                                     float scaleRatio, boolean isLoop) {
@@ -38,8 +45,9 @@ public class CardFragmentPagerAdapter<T> extends FragmentStatePagerAdapter imple
         }
 
         realSize = data.size();
+        mIsLoop = isLoop;
 
-        if (isLoop && realSize > 1) {
+        if (isLoop && realSize > 2) {
             ViewHolder viewHolder1 = viewHolders.get(realSize - 2);
             ViewHolder viewHolder2 = viewHolders.get(realSize - 1);
             ViewHolder viewHolder3 = viewHolders.get(0);
@@ -86,14 +94,49 @@ public class CardFragmentPagerAdapter<T> extends FragmentStatePagerAdapter imple
         return size;
     }
 
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    private static final String TAG = "CardFragmentPagerAdapter";
 
-        return super.instantiateItem(container, position);
+    @Override public Object instantiateItem(ViewGroup container, int position) {
+        if (!mIsLoop){
+            return super.instantiateItem(container,position);
+        }
+
+        if (position >= 1 && position <= 3){
+            if (mStartFragmentsCache[position - 1] == null){
+                mStartFragmentsCache[position - 1] = (Fragment) super.instantiateItem(container,position);
+            }
+            CardFragment cardFragment = (CardFragment) mStartFragmentsCache[position - 1];
+            CardView cardView = cardFragment.getCardView();
+            if (cardView != null) {
+                cardView.setScaleX(1);
+                cardView.setScaleY(1);
+                cardView.setElevation(getBaseElevation());
+            }
+            return mStartFragmentsCache[position - 1];
+        }else if (position <= getCount() - 2 && position >= getCount() - 4){
+            if (mEndFragmentsCache[position - getCount() + 4] == null){
+                mEndFragmentsCache[position - getCount() + 4] = (Fragment) super.instantiateItem(container,position);
+            }
+            CardFragment cardFragment = (CardFragment) mEndFragmentsCache[position - getCount() + 4];
+            CardView cardView = cardFragment.getCardView();
+            if (cardView != null) {
+                cardView.setScaleX(1);
+                cardView.setScaleY(1);
+                cardView.setElevation(getBaseElevation());
+            }
+            return mEndFragmentsCache[position - getCount() + 4];
+        }else {
+            return super.instantiateItem(container, position);
+        }
     }
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
+        if (mIsLoop) {
+            if ((position >= 1 && position <= 3) || (position <= getCount() - 2 && position >= getCount() - 4)){
+                return;
+            }
+        }
         super.destroyItem(container, position, object);
     }
 

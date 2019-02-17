@@ -6,6 +6,7 @@ import android.content.res.TypedArray;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import java.lang.ref.WeakReference;
@@ -58,26 +59,23 @@ public class CardBanner<T> extends ViewPager {
         mCardMargin = a.getDimension(R.styleable.CardBanner_cardMargin, dp2px(8));
         mSideCardWidth = a.getDimension(R.styleable.CardBanner_sideCardWidth, dp2px(16));
         mBaseElevation = a.getDimension(R.styleable.CardBanner_baseElevation, dp2px(0));
-        mScaleRatio = a.getFloat(R.styleable.CardBanner_scaleRatio,1);
+        mScaleRatio = a.getFloat(R.styleable.CardBanner_scaleRatio, 1);
         a.recycle();
 
         initScroller();
     }
 
+    private static final String TAG = "CardBanner";
+
     /**
      * 初始化 viewpager 界面参数
      */
     private void initBanner() {
-        setPadding((int) dp2px(mSideCardWidth), 0, (int)dp2px(mSideCardWidth), 0);
+        setPadding((int) dp2px(mSideCardWidth), 0, (int) dp2px(mSideCardWidth), 0);
         setOffscreenPageLimit(2);
 
         if (mIsLoop) {
-            post(new Runnable() {
-                @Override
-                public void run() {
-                    CardBanner.this.setCurrentItem(2);
-                }
-            });
+            setCurrentItem(2);
         }
 
         CardTransformerListener cardTransformerListener = new CardTransformerListener(
@@ -86,27 +84,28 @@ public class CardBanner<T> extends ViewPager {
         cardTransformerListener.setOnPageChangeListener(new OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset,
-                    int positionOffsetPixels) {
-                if (positionOffset < 0.05 || positionOffset > 0.95) {
-                    if (mIsLoop) {
-                        if (position == mCardFragmentPagerAdapter.getCount() - 2) {
-                            setCurrentItem(2, false);
-                        }
-                        if (position == 1) {
-                            setCurrentItem(mCardFragmentPagerAdapter.getCount() - 3, false);
-                        }
-                    }
-                }
+                                       int positionOffsetPixels) {
             }
 
             @Override
             public void onPageSelected(int position) {
-
+                Log.v(TAG, "onPageSelected: position " + position);
             }
 
             @Override
             public void onPageScrollStateChanged(int state) {
-
+                if (state != SCROLL_STATE_IDLE){
+                    return;
+                }
+                int position = getCurrentItem();
+                if (mIsLoop) {
+                    if (position == mCardFragmentPagerAdapter.getCount() - 2) {
+                        setCurrentItem(2, false);
+                    }
+                    if (position == 1) {
+                        setCurrentItem(mCardFragmentPagerAdapter.getCount() - 3, false);
+                    }
+                }
             }
         });
     }
@@ -118,7 +117,7 @@ public class CardBanner<T> extends ViewPager {
 
         mCardFragmentPagerAdapter = new CardFragmentPagerAdapter(
                 ((AppCompatActivity) getContext()).getSupportFragmentManager(), viewHolders,
-                datas, (int)mCardMargin,mBaseElevation, mScaleRatio, mIsLoop);
+                datas, (int) mCardMargin, mBaseElevation, mScaleRatio, mIsLoop);
         this.setAdapter(mCardFragmentPagerAdapter);
         realSize = datas.size();
 
@@ -189,7 +188,7 @@ public class CardBanner<T> extends ViewPager {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (isAutoScrolling){
+        if (isAutoScrolling) {
             removeCallbacks(mAutoScrollTask);
         }
     }
@@ -228,6 +227,7 @@ public class CardBanner<T> extends ViewPager {
             if (cardBanner != null) {
                 if (isAutoScrolling) {
                     if (mIsLoop) {
+                        currentItem = CardBanner.this.getCurrentItem();
                         cardBanner.setCurrentItem(
                                 scrollDirection ? ++currentItem : --currentItem);
                         postDelayed(this, scrollDuration);
