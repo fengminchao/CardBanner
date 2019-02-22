@@ -4,7 +4,6 @@ package com.muxistudio.cardbanner;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -42,7 +41,7 @@ public class CardBanner<T> extends ViewPager {
 
     private AutoScrollTask mAutoScrollTask;
 
-    private CardFragmentPagerAdapter mCardFragmentPagerAdapter;
+    private CardPagerAdapter mCardPagerAdapter;
 
     public CardBanner(Context context) {
         this(context, null);
@@ -79,7 +78,7 @@ public class CardBanner<T> extends ViewPager {
         }
 
         CardTransformerListener cardTransformerListener = new CardTransformerListener(
-                mCardFragmentPagerAdapter, mScaleRatio);
+                mCardPagerAdapter, mScaleRatio);
         addOnPageChangeListener(cardTransformerListener);
         cardTransformerListener.setOnPageChangeListener(new OnPageChangeListener() {
             @Override
@@ -99,11 +98,11 @@ public class CardBanner<T> extends ViewPager {
                 }
                 int position = getCurrentItem();
                 if (mIsLoop) {
-                    if (position == mCardFragmentPagerAdapter.getCount() - 2) {
+                    if (position == mCardPagerAdapter.getCount() - 2) {
                         setCurrentItem(2, false);
                     }
                     if (position == 1) {
-                        setCurrentItem(mCardFragmentPagerAdapter.getCount() - 3, false);
+                        setCurrentItem(mCardPagerAdapter.getCount() - 3, false);
                     }
                 }
             }
@@ -111,14 +110,15 @@ public class CardBanner<T> extends ViewPager {
     }
 
     public void setViewHolders(List<ViewHolder<T>> viewHolders, List<T> datas) {
+        Log.d(TAG, "setViewHolders: viewholders " + viewHolders.size() + " data " + datas.size());
         if (datas == null || datas.size() == 0) {
             return;
         }
 
-        mCardFragmentPagerAdapter = new CardFragmentPagerAdapter(
-                ((AppCompatActivity) getContext()).getSupportFragmentManager(), viewHolders,
+        mCardPagerAdapter = new CardPagerAdapter(
+                getContext(), viewHolders,
                 datas, (int) mCardMargin, mBaseElevation, mScaleRatio, mIsLoop);
-        this.setAdapter(mCardFragmentPagerAdapter);
+        this.setAdapter(mCardPagerAdapter);
         realSize = datas.size();
 
         initBanner();
@@ -146,7 +146,7 @@ public class CardBanner<T> extends ViewPager {
             return;
         }
         this.autoScroll = autoScroll;
-        startScroll();
+        startOrStopScroll();
     }
 
     /**
@@ -170,11 +170,15 @@ public class CardBanner<T> extends ViewPager {
         mIsLoop = loop;
     }
 
-    public void startScroll() {
+    public void startOrStopScroll() {
         if (!isAutoScrolling && autoScroll) {
             mAutoScrollTask = new AutoScrollTask(this);
             postDelayed(mAutoScrollTask, scrollDuration);
             isAutoScrolling = true;
+        }
+        if (!autoScroll && mAutoScrollTask != null){
+            isAutoScrolling = false;
+            removeCallbacks(mAutoScrollTask);
         }
     }
 
@@ -188,6 +192,7 @@ public class CardBanner<T> extends ViewPager {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        Log.d(TAG, "onDetachedFromWindow: ");
         if (isAutoScrolling) {
             removeCallbacks(mAutoScrollTask);
         }
@@ -200,7 +205,7 @@ public class CardBanner<T> extends ViewPager {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_OUTSIDE:
                 if (autoScroll) {
-                    startScroll();
+                    startOrStopScroll();
                 }
                 break;
             case MotionEvent.ACTION_DOWN:

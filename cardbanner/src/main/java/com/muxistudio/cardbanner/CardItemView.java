@@ -1,11 +1,12 @@
 package com.muxistudio.cardbanner;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.annotation.Px;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +17,9 @@ import android.widget.LinearLayout;
  * Created by ybao on 17/2/18.
  */
 
-public class CardFragment<T> extends Fragment {
+public class CardItemView<T> extends LinearLayout {
 
-    private static final String TAG = "CardFragment";
+    private static final String TAG = "CardItemView";
 
     private CardView mCardView;
     private View contentView;
@@ -33,48 +34,21 @@ public class CardFragment<T> extends Fragment {
     private static final String EXTRA_SCALE_RATIO = "scale_ratio";
     private static final String EXTRA_CARD_MARGIN = "card_margin";
 
-    private CardFragment() {
+    public CardItemView(Context context,float baseElevation,float scaleRatio,int cardMargin) {
+        super(context);
+        mBaseElevation = baseElevation;
+        mScaleRatio = scaleRatio;
+        this.cardMargin = cardMargin;
+
+        this.setGravity(Gravity.CENTER);
+        addCardView();
     }
 
-    public static CardFragment newInstance(float baseElevation, float scaleRatio, int cardMargin) {
-        Bundle args = new Bundle();
-        CardFragment fragment = new CardFragment();
-        args.putFloat(EXTRA_BASE_ELEVATION, baseElevation);
-        args.putFloat(EXTRA_SCALE_RATIO, scaleRatio);
-        args.putInt(EXTRA_CARD_MARGIN, cardMargin);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            mBaseElevation = bundle.getFloat(EXTRA_BASE_ELEVATION, 0);
-            mScaleRatio = bundle.getFloat(EXTRA_SCALE_RATIO, 1);
-            cardMargin = bundle.getInt(EXTRA_CARD_MARGIN, 0);
-        }
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.view_card, container, false);
-
-        mCardView = view.findViewById(R.id.card_view);
-
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        if (contentView != null) {
-            if (contentView.getParent() != null) {
-                ((ViewGroup) contentView.getParent()).removeView(contentView);
-            }
-            mCardView.addView(contentView, params);
-        }
-
+    private void addCardView() {
+        mCardView = new CardView(getContext());
+        ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
+        addView(mCardView,lp);
+        mCardView.setRadius(4 * getContext().getResources().getDisplayMetrics().density);
         mCardView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -91,11 +65,19 @@ public class CardFragment<T> extends Fragment {
                 }
             }
         });
-        return view;
     }
 
     public void setCardContentView(ViewHolder viewHolder, T data) {
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+        if (contentView != null) {
+            if (contentView.getParent() != null) {
+                ((ViewGroup) contentView.getParent()).removeView(contentView);
+            }
+        }
         contentView = viewHolder.getView(getContext(), data);
+        mCardView.addView(contentView, params);
     }
 
     public CardView getCardView() {
