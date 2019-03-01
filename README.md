@@ -26,7 +26,7 @@ allprojects {
 
 ```
 	dependencies {
-	        compile 'com.github.fengminchao:CardBanner:1.1.2'
+	        compile 'com.github.fengminchao:CardBanner:1.1.3'
 	}
 ```
 
@@ -95,6 +95,8 @@ cardParams.height = (int)((mCardView.getHeight() - mBaseElevation * mScaleRatio 
         }
         
         resIdList = Arrays.asList(resIds);
+        //设置自动滑动方向，放置于setViewHolders之前
+        mCardBanner.setScrollDirection(CardBanner.DIRECTION_FORWARD);
         //传递 ViewHolders 和 对应的数据 给  CardBanner
         mCardBanner.setViewHolders(mViewHolders,resIdList);
         //开启自动滚动播放
@@ -107,6 +109,9 @@ cardParams.height = (int)((mCardView.getHeight() - mBaseElevation * mScaleRatio 
 ```
 
 ## ChangeLogs
+
+### v1.1.3
+- 添加设置自动滑动方向的方法
 
 ### v1.1.2
 - 修复在 fragment 中使用 cardbanner 出现不显示的 bug
