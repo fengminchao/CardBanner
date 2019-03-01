@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
             mViewHolders.add(viewHolder);
         }
         resIdList = Arrays.asList(resIds);
+        mCardBanner.setScrollDirection(CardBanner.DIRECTION_FORWARD);
         mCardBanner.setViewHolders(mViewHolders,resIdList);
         mCardBanner.setScrollDuration(3000);
         mCardBanner.setScrollTime(500);

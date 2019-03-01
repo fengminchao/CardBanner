@@ -74,7 +74,11 @@ public class CardBanner<T> extends ViewPager {
         setOffscreenPageLimit(2);
 
         if (mIsLoop) {
-            setCurrentItem(2);
+            if (mLoopDirection == DIRECTION_FORWARD) {
+                setCurrentItem(2);
+            }else {
+                setCurrentItem(mCardPagerAdapter.getCount() - 3);
+            }
         }
 
         CardTransformerListener cardTransformerListener = new CardTransformerListener(
@@ -146,7 +150,11 @@ public class CardBanner<T> extends ViewPager {
             return;
         }
         this.autoScroll = autoScroll;
-        startOrStopScroll();
+        if (autoScroll) {
+            startScroll();
+        }else {
+            stopScroll();
+        }
     }
 
     /**
@@ -170,15 +178,11 @@ public class CardBanner<T> extends ViewPager {
         mIsLoop = loop;
     }
 
-    public void startOrStopScroll() {
+    public void startScroll() {
         if (!isAutoScrolling && autoScroll) {
             mAutoScrollTask = new AutoScrollTask(this);
             postDelayed(mAutoScrollTask, scrollDuration);
             isAutoScrolling = true;
-        }
-        if (!autoScroll && mAutoScrollTask != null){
-            isAutoScrolling = false;
-            removeCallbacks(mAutoScrollTask);
         }
     }
 
@@ -187,6 +191,19 @@ public class CardBanner<T> extends ViewPager {
             isAutoScrolling = false;
             removeCallbacks(mAutoScrollTask);
         }
+    }
+
+    public static final int DIRECTION_FORWARD = 0;
+    public static final int DIRECTION_BACKWARD = 1;
+
+    private int mLoopDirection = DIRECTION_FORWARD;
+
+    /**
+     * set scroll direction when loop="true"
+     * @param direction DIRECTION_FORWARD or DIRECTION_BACKWARD
+     */
+    public void setScrollDirection(int direction){
+        mLoopDirection = direction;
     }
 
     @Override
@@ -205,7 +222,7 @@ public class CardBanner<T> extends ViewPager {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_OUTSIDE:
                 if (autoScroll) {
-                    startOrStopScroll();
+                    startScroll();
                 }
                 break;
             case MotionEvent.ACTION_DOWN:
@@ -234,7 +251,7 @@ public class CardBanner<T> extends ViewPager {
                     if (mIsLoop) {
                         currentItem = CardBanner.this.getCurrentItem();
                         cardBanner.setCurrentItem(
-                                scrollDirection ? ++currentItem : --currentItem);
+                                mLoopDirection == DIRECTION_FORWARD ? ++currentItem : --currentItem);
                         postDelayed(this, scrollDuration);
                     } else {
                         currentItem = CardBanner.this.getCurrentItem();
